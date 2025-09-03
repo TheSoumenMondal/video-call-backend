@@ -1,4 +1,5 @@
 import { User } from '../models/user.model.js';
+import ValidationError from '../error/validationError.js';
 
 class AuthRepository {
   async register({
@@ -16,7 +17,7 @@ class AuthRepository {
       $or: [{ email }, { username }],
     });
     if (isExistingUser) {
-      throw new Error('User already exists');
+      throw new ValidationError('User already exists');
     }
     const newUser = new User({
       name,
