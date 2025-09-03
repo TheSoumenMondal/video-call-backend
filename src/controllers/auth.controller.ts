@@ -3,9 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import AuthRepository from '../repositories/auth.repository.js';
 import AuthService from '../services/auth.service.js';
 import ApiResponse from '../utils/apiResponse.js';
-import NotImplementedError from '../error/notImplementedError.js';
 import ValidationError from '../error/validationError.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import JwtUtility from '../utils/jwt.js';
 
 const authRepository = new AuthRepository();
 const authService = new AuthService(authRepository);
@@ -33,7 +33,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   if (!email || !password || !confirmPassword) {
     throw new ValidationError('All fields are required');
   }
+  
   const user = await authService.login({ email, password, confirmPassword });
+  const token = JwtUtility.generateJWTToken(user._id as string);
+  req.cookies.token = token;
+
   return new ApiResponse(res).send({
     data: user,
     status: StatusCodes.OK,
