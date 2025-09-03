@@ -1,5 +1,6 @@
 import { User } from '../models/user.model.js';
 import ValidationError from '../error/validationError.js';
+import hashPassword from '../utils/hashPassword.js';
 
 class AuthRepository {
   async register({
@@ -27,6 +28,22 @@ class AuthRepository {
     });
     await newUser.save();
     return newUser;
+  }
+
+  async login({ email, password }: { email: string; password: string }) {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new ValidationError('Invalid email or password');
+    }
+    const isPassCorrect = await hashPassword.compareHash(
+      password,
+      user.password,
+    );
+    if (!isPassCorrect) {
+      throw new ValidationError('Invalid email or password');
+    }
+    return user;
   }
 }
 

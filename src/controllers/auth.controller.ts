@@ -28,6 +28,17 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const login = asyncHandler(async (_req: Request, _res: Response) => {
-  throw new NotImplementedError('LogIn Controller not implemented');
+export const login = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password, confirmPassword } = req.body || {};
+  if (!email || !password || !confirmPassword) {
+    throw new ValidationError('All fields are required');
+  }
+  const user = await authService.login({ email, password, confirmPassword });
+  return new ApiResponse(res).send({
+    data: user,
+    status: StatusCodes.OK,
+    error: null,
+    message: 'Login successful',
+    success: true,
+  });
 });

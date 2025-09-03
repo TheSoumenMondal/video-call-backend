@@ -1,3 +1,4 @@
+import ValidationError from '../error/validationError.js';
 import AuthRepository from '../repositories/auth.repository.js';
 
 class AuthService {
@@ -22,6 +23,27 @@ class AuthService {
       email,
       username,
     });
+  }
+
+  async login({
+    email,
+    password,
+    confirmPassword,
+  }: {
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) {
+    if (password !== confirmPassword) {
+      throw new ValidationError('Passwords do not match');
+    }
+
+    const user = await this.authRepository.login({
+      email,
+      password,
+    });
+
+    return user;
   }
 }
 
